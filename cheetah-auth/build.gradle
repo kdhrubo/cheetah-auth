@@ -1,0 +1,48 @@
+plugins {
+	id 'org.springframework.boot' version '2.2.4.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id 'java'
+}
+
+group = 'com.cheetahapps.security'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+	
+	compile group: 'com.github.seratch', name: 'jslack-api-client', version: '3.1.4'
+	compile group: 'com.eatthepath', name: 'java-otp', version: '0.2.0'
+	compile group: 'io.vavr', name: 'vavr', version: '0.10.2'
+	
+	compile 'com.nimbusds:nimbus-jose-jwt:8.2.1'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	compile "org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.2.3.RELEASE"
+	testImplementation 'org.springframework.security:spring-security-test'
+}
+
+test {
+	useJUnitPlatform()
+}
