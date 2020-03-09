@@ -25,6 +25,12 @@ public class RoleLoader implements ApplicationRunner {
 			log.info("Saving role");
 			roleRepository.save(Role.builder().name(Role.USER).build());
 		}
+		
+		role = roleRepository.findByName(Role.COMPANY_ADMIN);
+		if (role == null) {
+			log.info("Saving role");
+			roleRepository.save(Role.builder().name(Role.COMPANY_ADMIN).build());
+		}
 	}
 
 }

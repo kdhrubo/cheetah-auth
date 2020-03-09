@@ -17,9 +17,10 @@ import lombok.NoArgsConstructor;
 public class Role {
 	
 	public static final String USER = "ROLE_USER";
+	public static final String COMPANY_ADMIN = "ROLE_COMPANY_ADMIN";
 	
 	@Id
-	private int id;
+	private String id;
 	
 	private String name;
     
