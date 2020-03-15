@@ -10,6 +10,7 @@ import java.util.Collection;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,17 +33,17 @@ public class User implements UserDetails{
 
 	@Id
 	private String id;
-
+	private String email;
 	private String mobile;
 	
 	
 	private String password;
-	private String fullName;
+	private String firstName;
+	private String lastName;
 	
+	@DBRef
 	private Role role;
 	
-	
-	private String email;
 	
 	private boolean deleted;
 	
@@ -53,6 +54,10 @@ public class User implements UserDetails{
 	private LocalDateTime createdDate;
 
 	private LocalDateTime lastLoginDate;
+	
+	private String verificationCode;
+	
+	private LocalDateTime verificationCodeCreatedDate;
 	
 	
 	
