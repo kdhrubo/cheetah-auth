@@ -24,7 +24,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	private final UserService userService;
 	private final BCryptPasswordEncoder passwordEncoder;
 
-	private static final String[] AUTHENTICATION_WHITELIST = { "/introspect", "/users/otp/**", "/health" };
+	private static final String[] AUTHENTICATION_WHITELIST = { 
+			"/introspect", 
+			"/health",
+			"/users/otp/**",
+			"/users/register/**", 
+			"/users/changepassword/**"};
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
