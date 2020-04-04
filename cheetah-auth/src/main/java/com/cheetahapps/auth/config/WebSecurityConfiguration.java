@@ -38,7 +38,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 		
 		.mvcMatchers("/.well-known/jwks.json").permitAll().and().authorizeRequests()
-				.antMatchers("/users/otp/**", "/health").permitAll().anyRequest().authenticated().and().httpBasic().and().csrf()
+				.antMatchers(AUTHENTICATION_WHITELIST).permitAll().anyRequest().authenticated().and().httpBasic().and().csrf()
 				.ignoringAntMatchers(AUTHENTICATION_WHITELIST);
 	}
 
