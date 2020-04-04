@@ -2,7 +2,6 @@ package com.cheetahapps.auth.controller;
 
 import javax.validation.Valid;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +23,7 @@ public class UserController {
 	
 	@PostMapping("/register")
 	public UserView register(@RequestBody User user) {
-		log.debug("Registering user");
+		log.info("Registering user");
 		User u = this.userService.register(user);
 		return new UserView(u.getId(), u.getFirstName(), u.getLastName(), u.getEmail(), u.getCreatedDate(), null);
 	}
