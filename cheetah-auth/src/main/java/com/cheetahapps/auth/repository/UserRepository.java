@@ -8,7 +8,7 @@ import com.cheetahapps.auth.domain.User;
 import io.vavr.control.Option;
 
 @Repository
-public interface UserRepository extends MongoRepository<User, Long> {
+public interface UserRepository extends MongoRepository<User, String> {
 	
 	
     Option<User> findByEmail(String email);

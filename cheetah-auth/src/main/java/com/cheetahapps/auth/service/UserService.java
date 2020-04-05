@@ -16,10 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cheetahapps.auth.domain.Role;
+import com.cheetahapps.auth.domain.Tenant;
 import com.cheetahapps.auth.domain.User;
 import com.cheetahapps.auth.integration.AwsEmailSender;
 import com.cheetahapps.auth.integration.SlackMessageSender;
 import com.cheetahapps.auth.repository.RoleRepository;
+import com.cheetahapps.auth.repository.TenantRepository;
 import com.cheetahapps.auth.repository.UserRepository;
 
 import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
@@ -35,6 +37,7 @@ public class UserService implements UserDetailsService {
 
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
+	private final TenantRepository tenantRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final SlackMessageSender slackMessageSender;
 	
@@ -72,8 +75,18 @@ public class UserService implements UserDetailsService {
 		return userRepository.findByEmail(email);
 	}
 
+	
 	public User register(User user) {
-
+		
+		log.info("Check and save tenant first. - {}", user.getTenant().getName());
+		
+		this.tenantRepository.findByName(user.getTenant().getName()).onEmpty(
+				
+				() -> this.tenantRepository.save(user.getTenant()) 		
+				
+		);
+		
+		
 		log.info("Registering user - {}", user.getEmail());
 
 		Role role = roleRepository.findByName(Role.COMPANY_ADMIN);

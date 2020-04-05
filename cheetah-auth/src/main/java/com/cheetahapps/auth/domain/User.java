@@ -10,6 +10,7 @@ import java.util.Collection;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,7 +24,8 @@ import static org.springframework.security.core.authority.AuthorityUtils.createA
 @AllArgsConstructor
 @Data
 @Builder
-@Document
+@Document("User")
+@TypeAlias("User")
 public class User implements UserDetails{
 
 	/**
@@ -58,6 +60,9 @@ public class User implements UserDetails{
 	private String verificationCode;
 	
 	private LocalDateTime verificationCodeCreatedDate;
+	
+	@DBRef
+	private Tenant tenant;
 	
 	
 	
