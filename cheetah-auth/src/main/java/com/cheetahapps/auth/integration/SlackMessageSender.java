@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SlackMessageSender {
 	
-	private final String url = "https://hooks.slack.com/services/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";
+	private final String url = "https://hooks.slack.com/services/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";
 	
 	public WebhookResponse send(String message) {
 		Payload payload = Payload.builder().text(message)

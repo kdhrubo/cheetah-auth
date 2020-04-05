@@ -9,7 +9,6 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
 
 import com.cheetahapps.auth.domain.User;
-import com.cheetahapps.auth.service.UserService;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -21,17 +20,16 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class AuthTokenConverter extends DefaultUserAuthenticationConverter {
 
-	private final UserService userService;
 
 	@Override
 	public Map<String, ?> convertUserAuthentication(Authentication authentication) {
 		
 		log.info("convertUserAuthentication - {}" , authentication.getPrincipal().getClass());
 		User user = (User) authentication.getPrincipal();
-		String username = authentication.getName();
 		Map<String, Object> response = new LinkedHashMap<>();
-		response.put("sub", username);
-		response.put("user_id", user.getId());
+		response.put("sub", user.getEmail());
+		response.put("userId", user.getId());
+		response.put("tenantId", user.getTenant().getCode());
 		
 		mapAuthorities(authentication, response);
 		

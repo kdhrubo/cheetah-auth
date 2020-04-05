@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
@@ -28,7 +29,8 @@ import static org.springframework.security.core.authority.AuthorityUtils.createA
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Document
+@Document("Client")
+@TypeAlias("Client")
 public class Client implements ClientDetails {
 
     

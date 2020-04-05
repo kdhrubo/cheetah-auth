@@ -1,6 +1,7 @@
 package com.cheetahapps.auth.domain;
 
 
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,18 +13,15 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Data
-@Document("Role")
-@TypeAlias("Role")
-public class Role {
-	
-	public static final String USER = "ROLE_USER";
-	public static final String COMPANY_ADMIN = "ROLE_COMPANY_ADMIN";
+@Builder
+@Document("TenantSequence")
+@TypeAlias("TenantSequence")
+public class TenantSequence {
 	
 	@Id
-	private String id;
-	
-	private String name;
-    
+    private String id;
+
+    private long seq;
+
 }

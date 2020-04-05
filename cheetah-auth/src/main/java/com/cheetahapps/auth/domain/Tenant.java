@@ -28,7 +28,7 @@ public class Tenant {
 	@Indexed(unique = true)
 	private String name;
 	
-	private long sequence;
+	private String code;
 	
 	private	Address address;
 	

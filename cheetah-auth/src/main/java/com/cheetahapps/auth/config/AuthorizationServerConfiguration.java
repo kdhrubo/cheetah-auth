@@ -69,7 +69,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 		converter.setKeyPair(this.keyPair);
 
 		DefaultAccessTokenConverter accessTokenConverter = new DefaultAccessTokenConverter();
-		accessTokenConverter.setUserTokenConverter(new AuthTokenConverter(userService));
+		accessTokenConverter.setUserTokenConverter(new AuthTokenConverter());
 		converter.setAccessTokenConverter(accessTokenConverter);
 
 		return converter;

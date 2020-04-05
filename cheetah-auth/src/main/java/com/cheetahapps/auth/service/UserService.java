@@ -8,6 +8,8 @@ import java.util.Map;
 
 import javax.crypto.KeyGenerator;
 
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.cheetahapps.auth.domain.Role;
 import com.cheetahapps.auth.domain.Tenant;
+import com.cheetahapps.auth.domain.TenantSequence;
 import com.cheetahapps.auth.domain.User;
 import com.cheetahapps.auth.integration.AwsEmailSender;
 import com.cheetahapps.auth.integration.SlackMessageSender;
@@ -25,6 +28,12 @@ import com.cheetahapps.auth.repository.TenantRepository;
 import com.cheetahapps.auth.repository.UserRepository;
 
 import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
+
+import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
+
+import java.util.Objects;
 
 import io.vavr.control.Option;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +47,10 @@ public class UserService implements UserDetailsService {
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
 	private final TenantRepository tenantRepository;
+	private final MongoOperations mongoOperations;
 	private final PasswordEncoder passwordEncoder;
 	private final SlackMessageSender slackMessageSender;
-	
+
 	private final TimeBasedOneTimePasswordGenerator totp;
 	private final KeyGenerator keyGenerator;
 
@@ -75,18 +85,21 @@ public class UserService implements UserDetailsService {
 		return userRepository.findByEmail(email);
 	}
 
-	
 	public User register(User user) {
-		
+
 		log.info("Check and save tenant first. - {}", user.getTenant().getName());
-		
-		this.tenantRepository.findByName(user.getTenant().getName()).onEmpty(
-				
-				() -> this.tenantRepository.save(user.getTenant()) 		
-				
-		);
-		
-		
+
+		Option<Tenant> t = this.tenantRepository.findByName(user.getTenant().getName());
+
+		if (t.isEmpty()) {
+			user.getTenant().setCode("T_" + getTenantSeq());
+			Tenant tentant = this.tenantRepository.save(user.getTenant());
+			
+			user.setTenant(tentant);
+		} else {
+			user.setTenant(t.get());
+		}
+
 		log.info("Registering user - {}", user.getEmail());
 
 		Role role = roleRepository.findByName(Role.COMPANY_ADMIN);
@@ -98,11 +111,12 @@ public class UserService implements UserDetailsService {
 
 		User u = this.userRepository.save(user);
 
-		slackMessageSender.send("New user created - " + u.getEmail() + " , Name - " + u.getFirstName() + " " + u.getLastName());
+		slackMessageSender
+				.send("New user created - " + u.getEmail() + " , Name - " + u.getFirstName() + " " + u.getLastName());
 
 		return u;
 	}
-	
+
 	public User generateOtp(String email) throws Exception {
 
 		Option<User> user = this.userRepository.findByEmail(email);
@@ -128,7 +142,7 @@ public class UserService implements UserDetailsService {
 
 		return this.userRepository.save(u);
 	}
-	
+
 	public User updatePassword(String email, String verificationCode, String password) {
 		Option<User> user = this.userRepository.findByEmail(email);
 
@@ -146,6 +160,12 @@ public class UserService implements UserDetailsService {
 		u.setPassword(passwordEncoder.encode(password));
 
 		return this.userRepository.save(u);
+	}
+
+	private long getTenantSeq() {
+		TenantSequence counter = mongoOperations.findAndModify(query(where("_id").is("tenant_sequence")),
+				new Update().inc("seq", 1), options().returnNew(true).upsert(true), TenantSequence.class);
+		return !Objects.isNull(counter) ? counter.getSeq() : 1;
 	}
 
 }
