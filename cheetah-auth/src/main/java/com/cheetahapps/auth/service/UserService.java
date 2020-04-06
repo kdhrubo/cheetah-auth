@@ -23,6 +23,7 @@ import com.cheetahapps.auth.domain.TenantSequence;
 import com.cheetahapps.auth.domain.User;
 import com.cheetahapps.auth.integration.AwsEmailSender;
 import com.cheetahapps.auth.integration.SlackMessageSender;
+import com.cheetahapps.auth.integration.UserRegistrationNotifier;
 import com.cheetahapps.auth.repository.RoleRepository;
 import com.cheetahapps.auth.repository.TenantRepository;
 import com.cheetahapps.auth.repository.UserRepository;
@@ -55,6 +56,8 @@ public class UserService implements UserDetailsService {
 	private final KeyGenerator keyGenerator;
 
 	private final AwsEmailSender awsEmailSender;
+	
+	private final UserRegistrationNotifier notifier;
 
 	@Transactional(readOnly = true)
 	@Override
@@ -113,6 +116,10 @@ public class UserService implements UserDetailsService {
 
 		slackMessageSender
 				.send("New user created - " + u.getEmail() + " , Name - " + u.getFirstName() + " " + u.getLastName());
+		
+		log.info("Signalling for provisioning");
+		
+		notifier.notify(u);
 
 		return u;
 	}
