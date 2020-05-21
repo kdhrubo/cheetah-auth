@@ -88,6 +88,7 @@ public class UserService implements UserDetailsService {
 		return userRepository.findByEmail(email);
 	}
 
+	//Potentially unsafe code, TODO if tenant present flag as error
 	public User register(User user) {
 
 		log.info("Check and save tenant first. - {}", user.getTenant().getName());
