@@ -8,8 +8,7 @@ import java.util.Map;
 
 import javax.crypto.KeyGenerator;
 
-import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,23 +17,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cheetahapps.auth.domain.Role;
-import com.cheetahapps.auth.domain.Tenant;
-import com.cheetahapps.auth.domain.TenantSequence;
 import com.cheetahapps.auth.domain.User;
+import com.cheetahapps.auth.event.BeforeUserRegisteredEvent;
 import com.cheetahapps.auth.integration.AwsEmailSender;
 import com.cheetahapps.auth.integration.SlackMessageSender;
 import com.cheetahapps.auth.integration.UserRegistrationNotifier;
+import com.cheetahapps.auth.problem.BusinessProcessingException;
+import com.cheetahapps.auth.problem.DuplicateUserProblem;
 import com.cheetahapps.auth.repository.RoleRepository;
-import com.cheetahapps.auth.repository.TenantRepository;
+
 import com.cheetahapps.auth.repository.UserRepository;
 
 import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
-
-import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
-import static org.springframework.data.mongodb.core.query.Query.query;
-
-import java.util.Objects;
 
 import io.vavr.control.Option;
 import lombok.RequiredArgsConstructor;
@@ -43,12 +37,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 @Service
-public class UserService implements UserDetailsService {
+public class UserBusinessDelegate implements UserDetailsService {
 
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
-	private final TenantRepository tenantRepository;
-	private final MongoOperations mongoOperations;
+	private final ApplicationEventPublisher eventPublisher;
+
 	private final PasswordEncoder passwordEncoder;
 	private final SlackMessageSender slackMessageSender;
 
@@ -56,12 +50,12 @@ public class UserService implements UserDetailsService {
 	private final KeyGenerator keyGenerator;
 
 	private final AwsEmailSender awsEmailSender;
-	
+
 	private final UserRegistrationNotifier notifier;
 
 	@Transactional(readOnly = true)
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) {
 		log.info("#  Finding user with mobile - {}", username);
 
 		UserDetails userDetails = null;
@@ -88,49 +82,61 @@ public class UserService implements UserDetailsService {
 		return userRepository.findByEmail(email);
 	}
 
-	//Potentially unsafe code, TODO if tenant present flag as error
-	public User register(User user) {
+	@Transactional
+	public User register(User user, String company, String country) {
+		//User with given email can exist for only one tenant. 
+		
+		findByEmail(user.getEmail()).onEmpty(() -> registerInternal(user, company, country))
+		.peek(u ->  { throw new DuplicateUserProblem(user.getEmail());});
 
-		log.info("Check and save tenant first. - {}", user.getTenant().getName());
+		
+		slackMessageSender
+				.send("New user created - " + user.getEmail() + " , Name - " + user.getFirstName() + " " + user.getLastName());
 
-		Option<Tenant> t = this.tenantRepository.findByName(user.getTenant().getName());
+		log.info("Signalling for provisioning");
 
-		if (t.isEmpty()) {
-			user.getTenant().setCode("T_" + getTenantSeq());
-			Tenant tentant = this.tenantRepository.save(user.getTenant());
-			
-			user.setTenant(tentant);
-		} else {
-			user.setTenant(t.get());
-		}
+		notifier.notify(user);
+
+		return user;
+	}
+
+	protected User registerInternal(User user, String company, String country) {
+		BeforeUserRegisteredEvent beforeUserRegisteredEvent = BeforeUserRegisteredEvent.builder().company(company)
+				.country(country).build();
+
+		this.eventPublisher.publishEvent(beforeUserRegisteredEvent);
 
 		log.info("Registering user - {}", user.getEmail());
 
-		Role role = roleRepository.findByName(Role.COMPANY_ADMIN);
-
-		user.setRole(role);
-
-		String password = user.getPassword();
-		user.setPassword(passwordEncoder.encode(password));
-
-		User u = this.userRepository.save(user);
-
-		slackMessageSender
-				.send("New user created - " + u.getEmail() + " , Name - " + u.getFirstName() + " " + u.getLastName());
 		
-		log.info("Signalling for provisioning");
+		Role role = null;
+		if (beforeUserRegisteredEvent.isExistingTenant()) {// admin needs to activate this user
+			role = roleRepository.findByName(Role.USER);
+			user.setDeleted(true); 
+		} else {// this user is auto active
+			role = roleRepository.findByName(Role.COMPANY_ADMIN);
+		}
 		
-		notifier.notify(u);
-
-		return u;
+		user.setRoleId(role.getId());
+		user.setRole(role.getName());
+		
+		return userRepository.findByEmail(user.getEmail()).getOrElse(() -> {
+			user.setTenantCode(beforeUserRegisteredEvent.getTenantCode());
+			user.setTenantId(beforeUserRegisteredEvent.getTenantId());
+			user.setPassword(passwordEncoder.encode(user.getPassword()));
+			
+			return this.userRepository.save(user);
+		});
+		
 	}
-
+	
+	
 	public User generateOtp(String email) throws Exception {
 
 		Option<User> user = this.userRepository.findByEmail(email);
 
 		if (user.isEmpty()) {
-			throw new RuntimeException("User with given email does not exist");
+			throw new BusinessProcessingException("User with given email does not exist");
 
 		}
 
@@ -155,25 +161,19 @@ public class UserService implements UserDetailsService {
 		Option<User> user = this.userRepository.findByEmail(email);
 
 		if (user.isEmpty()) {
-			throw new RuntimeException("User with given email does not exist");
+			throw new BusinessProcessingException("User with given email does not exist");
 
 		}
 
 		User u = user.get();
 
 		if (!u.getVerificationCode().equals(verificationCode)) {
-			throw new RuntimeException("Failed to match verificaiton code.");
+			throw new BusinessProcessingException("Failed to match verificaiton code.");
 		}
 
 		u.setPassword(passwordEncoder.encode(password));
 
 		return this.userRepository.save(u);
-	}
-
-	private long getTenantSeq() {
-		TenantSequence counter = mongoOperations.findAndModify(query(where("_id").is("tenant_sequence")),
-				new Update().inc("seq", 1), options().returnNew(true).upsert(true), TenantSequence.class);
-		return !Objects.isNull(counter) ? counter.getSeq() : 1;
 	}
 
 }

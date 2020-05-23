@@ -11,7 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,7 +35,8 @@ public class User implements UserDetails{
 
 	@Id
 	private String id;
-	private String email;
+	@Indexed(unique = true)
+	private String email; 
 	private String mobile;
 	
 	
@@ -43,9 +44,8 @@ public class User implements UserDetails{
 	private String firstName;
 	private String lastName;
 	
-	@DBRef
-	private Role role;
-	
+	private String role;
+	private String roleId;
 	
 	private boolean deleted;
 	
@@ -61,15 +61,16 @@ public class User implements UserDetails{
 	
 	private LocalDateTime verificationCodeCreatedDate;
 	
-	@DBRef
-	private Tenant tenant;
 	
+	private String tenantId;
+	private String tenantName;
+	private String tenantCode;
 	
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		
-		return createAuthorityList(role.getName());
+		return createAuthorityList(role);
 	}
 
 	@Override

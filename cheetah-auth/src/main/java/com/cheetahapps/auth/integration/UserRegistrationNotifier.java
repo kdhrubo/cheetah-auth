@@ -26,16 +26,20 @@ public class UserRegistrationNotifier {
 	private String provisionUrl;
 
 	public void notify(User user) {
+		/*
 		RestTemplate restTemplate = new RestTemplate();
 		
 		HttpHeaders headers = new HttpHeaders();
-	    headers.set("X-TENANT-ID", user.getTenant().getCode());    
+	    //headers.set("X-TENANT-ID", user.getTenant().getCode());    
 	    
 	    HttpEntity<User> request = new HttpEntity<>(user, headers);
 		
 		ResponseEntity<String> result = restTemplate.postForEntity(provisionUrl, request, String.class);
 		
 		log.info("Provision status - {}", result.getStatusCode());
+		*/
+		
+		log.info("== Launch provisioning ===");
 	}
 
 }

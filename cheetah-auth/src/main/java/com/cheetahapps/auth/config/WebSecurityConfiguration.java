@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.cheetahapps.auth.service.UserService;
+import com.cheetahapps.auth.service.UserBusinessDelegate;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	
-	private final UserService userService;
+	private final UserBusinessDelegate userBusinessDelegate;
 	private final BCryptPasswordEncoder passwordEncoder;
 
 	private static final String[] AUTHENTICATION_WHITELIST = { 
@@ -51,7 +51,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .userDetailsService(userService)
+                .userDetailsService(userBusinessDelegate)
                 .passwordEncoder(passwordEncoder);
     }
 
@@ -59,6 +59,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Bean
 	@Override
 	public UserDetailsService userDetailsService() {
-		return userService;
+		return userBusinessDelegate;
 	}
 }
