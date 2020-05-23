@@ -21,7 +21,6 @@ import com.cheetahapps.auth.domain.User;
 import com.cheetahapps.auth.event.BeforeUserRegisteredEvent;
 import com.cheetahapps.auth.integration.AwsEmailSender;
 import com.cheetahapps.auth.integration.SlackMessageSender;
-import com.cheetahapps.auth.integration.UserRegistrationNotifier;
 import com.cheetahapps.auth.problem.BusinessProcessingException;
 import com.cheetahapps.auth.problem.DuplicateUserProblem;
 import com.cheetahapps.auth.repository.RoleRepository;
@@ -51,7 +50,7 @@ public class UserBusinessDelegate implements UserDetailsService {
 
 	private final AwsEmailSender awsEmailSender;
 
-	private final UserRegistrationNotifier notifier;
+	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -93,9 +92,8 @@ public class UserBusinessDelegate implements UserDetailsService {
 		slackMessageSender
 				.send("New user created - " + user.getEmail() + " , Name - " + user.getFirstName() + " " + user.getLastName());
 
-		log.info("Signalling for provisioning");
+		log.info("New tenant provisioning to start");
 
-		notifier.notify(user);
 
 		return user;
 	}
