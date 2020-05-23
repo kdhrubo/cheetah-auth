@@ -17,7 +17,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import com.cheetahapps.auth.repository.ClientRepository;
-import com.cheetahapps.auth.service.UserService;
+import com.cheetahapps.auth.service.UserBusinessDelegate;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +29,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	private final AuthenticationManager authenticationManager;
 	private final KeyPair keyPair;
 	private final ClientRepository clientRepository;
-	private final UserService userService;
+	private final UserBusinessDelegate userBusinessDelegate;
 
 	@Value("${security.oauth2.authorizationserver.jwt.enabled:true}")
 	private boolean jwtEnabled;
@@ -51,7 +51,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 		}
 		// @formatter:on
 		
-		endpoints.userDetailsService(userService);
+		endpoints.userDetailsService(userBusinessDelegate);
 	}
 
 	@Bean

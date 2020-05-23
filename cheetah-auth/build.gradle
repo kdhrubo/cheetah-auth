@@ -51,6 +51,8 @@ dependencies {
 	compile group: 'javax.mail', name: 'javax.mail-api', version: '1.6.2'
 	
 	
+	compile group: 'org.zalando', name: 'problem-spring-web', version: '0.25.2'
+	
 	
 	runtime("org.springframework.boot:spring-boot-properties-migrator")
 	

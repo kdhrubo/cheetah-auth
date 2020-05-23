@@ -29,7 +29,7 @@ public class AuthTokenConverter extends DefaultUserAuthenticationConverter {
 		Map<String, Object> response = new LinkedHashMap<>();
 		response.put("sub", user.getEmail());
 		response.put("userId", user.getId());
-		response.put("tenantId", user.getTenant().getCode());
+		response.put("tenantId", user.getTenantCode());
 		
 		mapAuthorities(authentication, response);
 		

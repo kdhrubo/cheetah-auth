@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -68,12 +69,12 @@ public class Client implements ClientDetails {
 
     @Override
     public Set<String> getScope() {
-    	return new HashSet<String>(Arrays.asList(this.scopes.split(",")));
+    	return new HashSet<>(Arrays.asList(this.scopes.split(",")));
     }
 
     @Override
     public Set<String> getAuthorizedGrantTypes() {
-    	return new HashSet<String>(Arrays.asList(this.grantTypes.split(",")));
+    	return new HashSet<>(Arrays.asList(this.grantTypes.split(",")));
         
     }
 
@@ -99,16 +100,16 @@ public class Client implements ClientDetails {
 
     @Override
     public Set<String> getRegisteredRedirectUri() {
-        return null;
+        return Collections.emptySet();
     }
 
     @Override
     public Map<String, Object> getAdditionalInformation() {
-        return null;
+        return Collections.emptyMap();
     }
 
     @Override
     public Set<String> getResourceIds() {
-        return null;
+        return Collections.emptySet();
     }
 }

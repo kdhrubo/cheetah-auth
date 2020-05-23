@@ -34,6 +34,8 @@ public class Tenant {
 	
 	private boolean deleted;
 	
+	private boolean provisioned;
+	
 	@LastModifiedDate
 	private LocalDateTime lastModifiedDate;
 	
