@@ -10,6 +10,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.cheetahapps.auth.domain.Tenant;
 import com.cheetahapps.auth.domain.TenantSequence;
@@ -27,6 +28,7 @@ public class TenantBusinessDelegate {
 	private final MongoOperations mongoOperations;
 
 	@EventListener
+	@Transactional
 	public void registerTenant(BeforeUserRegisteredEvent beforeUserRegisteredEvent) {
 		String tenantName = beforeUserRegisteredEvent.getCompany();
 		log.info("Registering new tenant - {}", tenantName);
@@ -39,6 +41,8 @@ public class TenantBusinessDelegate {
 			updateBeforeUserRegisteredEvent(beforeUserRegisteredEvent, t, false);
 
 		}).peek(t -> updateBeforeUserRegisteredEvent(beforeUserRegisteredEvent, t, true));
+		
+		log.info("Looking for unprovisioned tenants - {}", tenantRepository.findByProvisionedFalse());
 
 	}
 
