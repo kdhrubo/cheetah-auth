@@ -1,11 +1,9 @@
-package com.cheetahapps.auth.repository;
+package com.cheetahapps.auth.client;
 
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import com.cheetahapps.auth.domain.Client;
 
 @Repository
 public interface ClientRepository extends MongoRepository<Client, String> {

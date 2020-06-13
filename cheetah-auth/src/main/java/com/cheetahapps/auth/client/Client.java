@@ -1,4 +1,4 @@
-package com.cheetahapps.auth.domain;
+package com.cheetahapps.auth.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

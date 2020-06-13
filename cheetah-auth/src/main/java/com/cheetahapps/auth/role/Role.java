@@ -1,7 +1,11 @@
-package com.cheetahapps.auth.domain;
+package com.cheetahapps.auth.role;
 
 
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -18,12 +22,17 @@ import lombok.NoArgsConstructor;
 @TypeAlias("Role")
 public class Role {
 	
-	public static final String USER = "ROLE_USER";
-	public static final String COMPANY_ADMIN = "ROLE_COMPANY_ADMIN";
-	
 	@Id
 	private String id;
 	
 	private String name;
+	
+	private boolean system;
+	
+	@CreatedDate
+	private LocalDateTime createdDate;
+	
+	@LastModifiedDate
+	private LocalDateTime lastModifiedDate;
     
 }
