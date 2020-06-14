@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
-import com.cheetahapps.auth.repository.ClientRepository;
+import com.cheetahapps.auth.client.ClientRepository;
 import com.cheetahapps.auth.service.UserBusinessDelegate;
 
 import lombok.RequiredArgsConstructor;

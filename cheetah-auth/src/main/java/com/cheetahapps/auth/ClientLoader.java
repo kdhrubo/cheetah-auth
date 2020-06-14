@@ -11,10 +11,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.cheetahapps.auth.domain.Client;
+import com.cheetahapps.auth.client.Client;
+import com.cheetahapps.auth.client.ClientRepository;
 import com.cheetahapps.auth.domain.GrantType;
 import com.cheetahapps.auth.domain.ScopeType;
-import com.cheetahapps.auth.repository.ClientRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
