@@ -22,12 +22,12 @@ public class SmtpConfiguration {
 	
 	@Bean
 	public SmtpServer smtpServer() {
-		SmtpServer server = MailServer.create()
+		return MailServer.create()
 	            .ssl(allowTls).host(smtpServer)
 	            .port(smtpPort)
 	            .auth(smtpUser, smtpPassword)
 	            .buildSmtpMailServer();
 		
-		return server;
+		
 	}
 }
