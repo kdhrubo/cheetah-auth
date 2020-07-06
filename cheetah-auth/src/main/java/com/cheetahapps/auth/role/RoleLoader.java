@@ -30,7 +30,7 @@ public class RoleLoader implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) {
 
-		log.info("== check and load tenant ==");
+		log.debug("Load roles");
 
 		Try.run(() -> load());
 	}
