@@ -29,7 +29,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 			"/health",
 			"/users/otp/**",
 			"/users/register/**", 
-			"/users/changepassword/**"};
+			"/users/changepassword/**",
+			"/issuer/.well-known/openid-configuration", 
+			"/.well-known/openid-configuration/issuer",
+			"/.well-known/oauth-authorization-server/issuer",
+			"/.well-known/jwks.json"
+	
+	};
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -37,7 +43,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 		http.authorizeRequests()
 		
-		.mvcMatchers("/.well-known/jwks.json").permitAll().and().authorizeRequests()
+		.mvcMatchers(AUTHENTICATION_WHITELIST).permitAll().and().authorizeRequests()
 				.antMatchers(AUTHENTICATION_WHITELIST).permitAll().anyRequest().authenticated().and().httpBasic().and().csrf()
 				.ignoringAntMatchers(AUTHENTICATION_WHITELIST);
 	}

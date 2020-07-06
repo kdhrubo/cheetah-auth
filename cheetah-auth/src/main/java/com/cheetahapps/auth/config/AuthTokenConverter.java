@@ -24,13 +24,13 @@ public class AuthTokenConverter extends DefaultUserAuthenticationConverter {
 	@Override
 	public Map<String, ?> convertUserAuthentication(Authentication authentication) {
 		
-		log.info("convertUserAuthentication - {}" , authentication.getPrincipal().getClass());
 		User user = (User) authentication.getPrincipal();
 		Map<String, Object> response = new LinkedHashMap<>();
 		response.put("sub", user.getEmail());
 		response.put("userId", user.getId());
 		response.put("tenantId", user.getTenantId());
 		response.put("tenantCode", user.getTenantCode());
+		response.put("iss", "http://localhost:7001/auth/issuer");
 		
 		mapAuthorities(authentication, response);
 		
