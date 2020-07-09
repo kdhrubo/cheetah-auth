@@ -1,7 +1,7 @@
 package com.cheetahapps.auth.config;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,10 +16,11 @@ import java.util.Map;
 
 import static java.util.Objects.nonNull;
 
-@Slf4j
+
 @RequiredArgsConstructor
 public class AuthTokenConverter extends DefaultUserAuthenticationConverter {
-
+	
+	
 
 	@Override
 	public Map<String, ?> convertUserAuthentication(Authentication authentication) {
@@ -28,9 +29,11 @@ public class AuthTokenConverter extends DefaultUserAuthenticationConverter {
 		Map<String, Object> response = new LinkedHashMap<>();
 		response.put("sub", user.getEmail());
 		response.put("userId", user.getId());
+		response.put("firstName", user.getFirstName());
+		response.put("lastName", user.getLastName());
 		response.put("tenantId", user.getTenantId());
 		response.put("tenantCode", user.getTenantCode());
-		response.put("iss", "http://localhost:7001/auth/issuer");
+		response.put("iss", "http://localhost:7001/auth/issuer"); // remove hard coding
 		
 		mapAuthorities(authentication, response);
 		
