@@ -25,7 +25,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	private final BCryptPasswordEncoder passwordEncoder;
 
 	private static final String[] AUTHENTICATION_WHITELIST = { 
-			"/introspect", 
 			"/health",
 			"/users/otp/**",
 			"/users/register/**", 
